@@ -1,0 +1,38 @@
+name: Build Plugin
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup JUCE
+      run: |
+        git clone https://github.com/juce-framework/JUCE.git
+        cd JUCE && git checkout 7.0.9
+    
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+    
+    - name: Build
+      run: cmake --build build --config Release
+    
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: פלאגין רוורב סטריאו עם קונטרול על גודל החדר וdeca-${{ matrix.os }}
+        path: |
+          build/**/*.vst3
+          build/**/*.component
+          build/**/*.dll
